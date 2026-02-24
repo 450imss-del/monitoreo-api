@@ -1,0 +1,72 @@
+from flask import Flask, jsonify
+from flask_cors import CORS
+import random
+import datetime
+
+app = Flask(__name__)
+CORS(app)
+
+# =========================
+# DATOS SIMULADOS + REALES
+# =========================
+
+def get_sismo_real():
+    # Aquí luego conectarás SSN, IRIS, JMA
+    return {
+        "fuente": "SSN (simulado)",
+        "magnitud": round(random.uniform(2.5, 5.5), 1),
+        "profundidad": random.randint(5, 50),
+        "lat": 19.43 + random.uniform(-0.2, 0.2),
+        "lon": -99.13 + random.uniform(-0.2, 0.2),
+        "hora": datetime.datetime.utcnow().isoformat() + "Z"
+    }
+
+# =========================
+# ENDPOINT PRINCIPAL
+# =========================
+
+@app.route("/api/sismo")
+def sismo():
+    data = get_sismo_real()
+    return jsonify(data)
+
+# =========================
+# SIMULACRO
+# =========================
+
+@app.route("/api/simulacro")
+def simulacro():
+    data = {
+        "fuente": "SIMULACRO",
+        "magnitud": 7.8,
+        "profundidad": 15,
+        "lat": 16.5,
+        "lon": -98.5,
+        "hora": datetime.datetime.utcnow().isoformat() + "Z",
+        "alerta": "🚨 SISMO FUERTE SIMULADO"
+    }
+    return jsonify(data)
+
+# =========================
+# MODO TV NOTICIAS
+# =========================
+
+@app.route("/api/ticker")
+def ticker():
+    mensajes = [
+        "Último sismo detectado en Guerrero",
+        "Sistema de monitoreo activo 24/7",
+        "Sin alertas críticas en CDMX",
+        "Fuente: SSN / IRIS / JMA",
+        "Panel TV Modo Noticias"
+    ]
+    return jsonify({
+        "mensaje": random.choice(mensajes)
+    })
+
+# =========================
+# SERVIDOR
+# =========================
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
